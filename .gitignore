@@ -49,3 +49,5 @@ key.properties
 
 # Supabase
 .supabase/
+
+*.apk
