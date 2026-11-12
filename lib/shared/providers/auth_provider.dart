@@ -129,29 +129,47 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final res = await SupabaseService.client.auth.signUp(
         email: email.trim(),
         password: password,
-      );
-
-      final user = res.user;
-      if (user != null) {
-        // Create initial profile
-        await SupabaseService.client.from('profiles').insert({
-          'id': user.id,
+        data: {
           'full_name': fullName.trim(),
           'phone': phone.trim(),
           'division': division,
           'district': district,
-          'blood_group': bloodGroup,
-        });
+          if (bloodGroup != null) 'blood_group': bloodGroup,
+        },
+      );
 
-        // Add base role
-        await SupabaseService.client.from('user_roles').insert({
-          'user_id': user.id,
-          'role': 'registered_user',
-        });
+      final user = res.user;
+      if (user != null) {
+        if (res.session != null) {
+          try {
+            await SupabaseService.client.from('profiles').upsert({
+              'id': user.id,
+              'full_name': fullName.trim(),
+              'phone': phone.trim(),
+              'division': division,
+              'district': district,
+              'blood_group': bloodGroup,
+            });
 
-        state = state.copyWith(status: AuthStatus.authenticated, user: user);
-        await loadUserProfile(user.id);
-        return true;
+            await SupabaseService.client.from('user_roles').upsert({
+              'user_id': user.id,
+              'role': 'registered_user',
+            });
+          } catch (e) {
+            print('Profile insert info: $e');
+          }
+
+          state = state.copyWith(status: AuthStatus.authenticated, user: user);
+          await loadUserProfile(user.id);
+          return true;
+        } else {
+          // Supabase project requires email confirmation
+          state = state.copyWith(
+            status: AuthStatus.unauthenticated,
+            errorMessage: 'অ্যাকাউন্ট তৈরি হয়েছে! আপনার ইমেইল কনফার্ম করুন অথবা লগইন করুন।',
+          );
+          return true;
+        }
       }
       return false;
     } catch (e) {
