@@ -22,12 +22,12 @@ class AppConfig {
   // Note: Anon key is client-safe with RLS. Service role key is NEVER embedded in the client!
   static const String supabaseUrl = String.fromEnvironment(
     'SUPABASE_URL',
-    defaultValue: 'https://bloodbond-bangladesh.supabase.co',
+    defaultValue: 'https://udushfprexltqjbqlmro.supabase.co',
   );
 
   static const String supabaseAnonKey = String.fromEnvironment(
     'SUPABASE_ANON_KEY',
-    defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy_anon_key_for_client_safety',
+    defaultValue: 'sb_publishable_kJGyf_zlH1zGHr9tYarl9w_O7NCwBzY',
   );
 
   // Geographic Discovery Limits (km)
