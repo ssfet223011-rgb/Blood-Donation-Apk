@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BloodBond Bangladesh — National Admin & Command Center</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Chart.js for analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand-header">
+        <div class="brand-logo-circle">
+          <svg viewBox="0 0 24 24" fill="currentColor" class="drop-icon">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2>BloodBond</h2>
+          <span class="badge-tag">ADMIN PORTAL</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="dashboard">
+          <span class="icon">📊</span> Dashboard
+        </button>
+        <button class="nav-item" data-tab="donors">
+          <span class="icon">🩸</span> Donor Registry
+        </button>
+        <button class="nav-item" data-tab="requests">
+          <span class="icon">🚨</span> Blood Requests
+        </button>
+        <button class="nav-item" data-tab="verifications">
+          <span class="icon">✅</span> Donation Verification
+        </button>
+        <button class="nav-item" data-tab="reviews">
+          <span class="icon">⭐</span> Review Moderation
+        </button>
+        <button class="nav-item" data-tab="organizations">
+          <span class="icon">🏥</span> Organizations & Camps
+        </button>
+        <button class="nav-item" data-tab="analytics">
+          <span class="icon">📈</span> National Analytics
+        </button>
+        <button class="nav-item" data-tab="audit">
+          <span class="icon">🛡️</span> Security & Audit Logs
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar">ADM</div>
+          <div class="user-meta">
+            <span class="user-name">Central Directorate</span>
+            <span class="user-role">Super Admin</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="search-bar">
+          <input type="text" id="globalSearch" placeholder="Search by Donor ID (BB-CTG-...), Phone, Patient Name..." />
+        </div>
+        <div class="topbar-actions">
+          <div class="status-indicator">
+            <span class="pulse-dot"></span> Live Nationwide Network
+          </div>
+          <button class="btn btn-emergency" id="btnEmergencyBroadcast">
+            <span>🚨</span> Emergency Alert
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB 1: DASHBOARD -->
+      <section id="tab-dashboard" class="content-tab active">
+        <div class="section-header">
+          <div>
+            <h1>National Command Overview</h1>
+            <p class="subtitle">Real-time statistics across all 8 Divisions and 64 Districts of Bangladesh</p>
+          </div>
+          <button class="btn btn-secondary" onclick="refreshDashboardStats()">🔄 Refresh</button>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon bg-blue">👥</div>
+            <div class="stat-data">
+              <span class="stat-title">Total Registered Users</span>
+              <h2 id="statTotalUsers">124,580</h2>
+              <span class="trend positive">↑ 12.4% this month</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon bg-red">🩸</div>
+            <div class="stat-data">
+              <span class="stat-title">Registered Donors</span>
+              <h2 id="statTotalDonors">84,320</h2>
+              <span class="trend positive">↑ 8.2% this month</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon bg-green">🟢</div>
+            <div class="stat-data">
+              <span class="stat-title">Available Donors Right Now</span>
+              <h2 id="statAvailableDonors">61,400</h2>
+              <span class="subtext">72.8% of donor pool</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon bg-amber">⚡</div>
+            <div class="stat-data">
+              <span class="stat-title">Active Blood Requests</span>
+              <h2 id="statActiveRequests">142</h2>
+              <span class="subtext">28 marked Emergency</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon bg-purple">🏆</div>
+            <div class="stat-data">
+              <span class="stat-title">Verified Donations Completed</span>
+              <h2 id="statCompletedDonations">42,890</h2>
+              <span class="trend positive">100% verified records</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon bg-crimson">🚨</div>
+            <div class="stat-data">
+              <span class="stat-title">Emergency Matches (5km)</span>
+              <h2 id="statEmergencyMatches">318</h2>
+              <span class="subtext">Avg response: 18 mins</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Emergency Feed & Distribution Chart -->
+        <div class="grid-2-col">
+          <div class="card">
+            <div class="card-header">
+              <h3>🚨 Active Emergency Requests</h3>
+              <span class="badge bg-red">PRIORITY 1</span>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="data-table" id="emergencyTable">
+                  <thead>
+                    <tr>
+                      <th>Patient & Hospital</th>
+                      <th>Blood</th>
+                      <th>District</th>
+                      <th>Units</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Md. Rafiqul Islam</strong>
+                        <div class="text-muted">Dhaka Medical College Hospital</div>
+                      </td>
+                      <td><span class="blood-pill bg-o-neg">O-</span></td>
+                      <td>Dhaka</td>
+                      <td>2 Units</td>
+                      <td><span class="status-pill status-active">Active (Matching)</span></td>
+                      <td><button class="btn btn-sm btn-primary">Dispatch</button></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Tanzina Akter</strong>
+                        <div class="text-muted">Chittagong Medical College Hospital</div>
+                      </td>
+                      <td><span class="blood-pill bg-b-neg">B-</span></td>
+                      <td>Chattogram</td>
+                      <td>1 Unit</td>
+                      <td><span class="status-pill status-active">Active (Matching)</span></td>
+                      <td><button class="btn btn-sm btn-primary">Dispatch</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>📊 National Blood Group Inventory & Demand</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="bloodGroupChart" height="220"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: DONORS -->
+      <section id="tab-donors" class="content-tab">
+        <div class="section-header">
+          <div>
+            <h1>National Donor Registry</h1>
+            <p class="subtitle">Search, inspect and verify voluntary donors with privacy controls</p>
+          </div>
+          <div class="filter-group">
+            <select id="donorDivisionFilter" class="select-input">
+              <option value="">All Divisions</option>
+              <option value="Dhaka">Dhaka</option>
+              <option value="Chattogram">Chattogram</option>
+              <option value="Rajshahi">Rajshahi</option>
+              <option value="Khulna">Khulna</option>
+              <option value="Barishal">Barishal</option>
+              <option value="Sylhet">Sylhet</option>
+              <option value="Rangpur">Rangpur</option>
+              <option value="Mymensingh">Mymensingh</option>
+            </select>
+            <select id="donorBloodFilter" class="select-input">
+              <option value="">All Blood Groups</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <table class="data-table" id="donorListTable">
+              <thead>
+                <tr>
+                  <th>Donor ID</th>
+                  <th>Full Name</th>
+                  <th>Blood</th>
+                  <th>District / Division</th>
+                  <th>Availability</th>
+                  <th>Donations</th>
+                  <th>Badge</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>BB-CTG-000001</code></td>
+                  <td>Tanvir Hossain</td>
+                  <td><span class="blood-pill">O+</span></td>
+                  <td>Chattogram</td>
+                  <td><span class="status-pill status-available">Available</span></td>
+                  <td><strong>12</strong></td>
+                  <td><span class="badge-award">🏆 Champion</span></td>
+                  <td><button class="btn btn-sm btn-secondary">Inspect</button></td>
+                </tr>
+                <tr>
+                  <td><code>BB-DHA-000042</code></td>
+                  <td>Dr. Farhana Ahmed</td>
+                  <td><span class="blood-pill bg-o-neg">O-</span></td>
+                  <td>Dhaka (Dhanmondi)</td>
+                  <td><span class="status-pill status-resting">Resting (90d)</span></td>
+                  <td><strong>26</strong></td>
+                  <td><span class="badge-award">👑 Legend</span></td>
+                  <td><button class="btn btn-sm btn-secondary">Inspect</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: REQUESTS -->
+      <section id="tab-requests" class="content-tab">
+        <div class="section-header">
+          <div>
+            <h1>Blood Requests Moderation</h1>
+            <p class="subtitle">Review suspicious requests, verify urgency, and monitor completions</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <table class="data-table" id="allRequestsTable">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Patient</th>
+                  <th>Blood</th>
+                  <th>Hospital</th>
+                  <th>District</th>
+                  <th>Urgency</th>
+                  <th>Date Needed</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>REQ-8891</code></td>
+                  <td>Md. Karim Ullah</td>
+                  <td><span class="blood-pill">A+</span></td>
+                  <td>National Heart Institute</td>
+                  <td>Dhaka</td>
+                  <td><span class="badge bg-red">Emergency</span></td>
+                  <td>Today</td>
+                  <td><span class="status-pill status-active">Active</span></td>
+                  <td><button class="btn btn-sm btn-primary">Match 5km</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: VERIFICATIONS -->
+      <section id="tab-verifications" class="content-tab">
+        <div class="section-header">
+          <div>
+            <h1>Official Donation Verification</h1>
+            <p class="subtitle">Verify blood bank receipts and hospital donation certificates to update official donor records</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <p class="info-banner">
+              ⚠️ Official donation verification automatically increments official donor counts, triggers achievement rewards, and sets the donor's 90-day cooldown rest period.
+            </p>
+            <table class="data-table" id="pendingDonationsTable">
+              <thead>
+                <tr>
+                  <th>Donation ID</th>
+                  <th>Donor</th>
+                  <th>Date</th>
+                  <th>Hospital / Camp</th>
+                  <th>Units</th>
+                  <th>Certificate / Receipt</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>DON-2026-901</code></td>
+                  <td>Zubair Al-Mahmud (BB-DHA-000109)</td>
+                  <td>11 Nov 2026</td>
+                  <td>Red Crescent Blood Center</td>
+                  <td>1 Unit</td>
+                  <td><a href="#" class="link-doc">📄 Receipt-901.pdf</a></td>
+                  <td><span class="status-pill status-pending">Pending Review</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-success" onclick="verifyDonation('DON-2026-901')">Approve & Verify</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: REVIEWS -->
+      <section id="tab-reviews" class="content-tab">
+        <div class="section-header">
+          <div>
+            <h1>Review & Rating Moderation</h1>
+            <p class="subtitle">Ensuring 100% verified interactions without spam or abusive feedback</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Reviewer</th>
+                  <th>Donor</th>
+                  <th>Request ID</th>
+                  <th>Rating</th>
+                  <th>Feedback</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Saiful Islam</td>
+                  <td>Tanvir Hossain (BB-CTG-000001)</td>
+                  <td>REQ-8104</td>
+                  <td>⭐⭐⭐⭐⭐ (5.0)</td>
+                  <td>"Arrived within 35 minutes at CTG Medical. Truly a lifesaver!"</td>
+                  <td>10 Nov 2026</td>
+                  <td><span class="badge bg-green">Approved</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 6: ORGANIZATIONS & CAMPAIGNS -->
+      <section id="tab-organizations" class="content-tab">
+        <div class="section-header">
+          <div>
+            <h1>Registered Organizations & Blood Drives</h1>
+            <p class="subtitle">Partner hospitals, Red Crescent branches, and university blood clubs</p>
+          </div>
+        </div>
+        <div class="grid-2-col">
+          <div class="card">
+            <div class="card-header">
+              <h3>Affiliated Blood Banks</h3>
+            </div>
+            <div class="card-body">
+              <ul class="org-list">
+                <li>
+                  <strong>Bangladesh Red Crescent Society</strong>
+                  <p>National Blood Center, Mohammadpur, Dhaka</p>
+                  <span class="badge bg-green">Verified Partner</span>
+                </li>
+                <li>
+                  <strong>Quantum Foundation Blood Lab</strong>
+                  <p>Shantinagar, Dhaka</p>
+                  <span class="badge bg-green">Verified Partner</span>
+                </li>
+                <li>
+                  <strong>Sandhani (DMC Unit)</strong>
+                  <p>Dhaka Medical College, Dhaka</p>
+                  <span class="badge bg-green">Verified Partner</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3>Upcoming Blood Drives & Campaigns</h3>
+            </div>
+            <div class="card-body">
+              <ul class="camp-list">
+                <li>
+                  <strong>Victory Day National Blood Drive</strong>
+                  <p>Dhaka University TSC • Target: 500 Units</p>
+                  <span class="status-pill status-active">Active Campaign</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 7: ANALYTICS -->
+      <section id="tab-analytics" class="content-tab">
+        <div class="section-header">
+          <div>
+            <h1>Nationwide Geographic & Demand Analytics</h1>
+            <p class="subtitle">PostGIS Spatial Analytics and District-Level Fulfillment Rates</p>
+          </div>
+        </div>
+        <div class="grid-2-col">
+          <div class="card">
+            <div class="card-header">
+              <h3>🗺️ Donations by Division</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="divisionChart" height="240"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3>📈 Monthly Request Fulfillment Rate</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="monthlyTrendChart" height="240"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 8: AUDIT -->
+      <section id="tab-audit" class="content-tab">
+        <div class="section-header">
+          <div>
+            <h1>Immutable Security & Audit Trail</h1>
+            <p class="subtitle">Complete cryptographic and access audit logs for all sensitive platform events</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Actor</th>
+                  <th>Action</th>
+                  <th>Entity</th>
+                  <th>Entity ID</th>
+                  <th>Metadata</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody">
+                <tr>
+                  <td>2026-11-12 09:42:10</td>
+                  <td><code>usr-82910</code></td>
+                  <td><span class="badge bg-green">VERIFY_DONATION</span></td>
+                  <td>donations</td>
+                  <td><code>don-2026-901</code></td>
+                  <td><code>{"units": 1, "hospital": "BDRCS"}</code></td>
+                </tr>
+                <tr>
+                  <td>2026-11-12 09:30:05</td>
+                  <td><code>usr-33120</code></td>
+                  <td><span class="badge bg-blue">APPROVE_CONTACT</span></td>
+                  <td>contact_requests</td>
+                  <td><code>cr-1092</code></td>
+                  <td><code>{"expiry_hrs": 48}</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
