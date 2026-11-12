@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/config/app_config.dart';
 import '../../core/services/supabase_service.dart';
 import '../../shared/models/review_model.dart';
 import '../../shared/widgets/empty_state.dart';

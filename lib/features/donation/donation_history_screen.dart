@@ -50,7 +50,7 @@ class DonationHistoryScreen extends ConsumerWidget {
 
           Expanded(
             child: donations.isEmpty
-                ? EmptyStateWidget(
+                ? const EmptyStateWidget(
                     icon: Icons.history,
                     title: 'No Donation Records Yet',
                     message:

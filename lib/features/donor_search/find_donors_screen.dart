@@ -19,7 +19,7 @@ class FindDonorsScreen extends ConsumerStatefulWidget {
 }
 
 class _FindDonorsScreenState extends ConsumerState<FindDonorsScreen> {
-  bool _isMapView = false;
+  final bool _isMapView = false;
 
   void _showContactDialog(DonorProfile donor) {
     final user = ref.read(authProvider).user;

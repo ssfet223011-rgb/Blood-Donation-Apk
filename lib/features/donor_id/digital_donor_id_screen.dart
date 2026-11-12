@@ -92,10 +92,10 @@ class _DigitalDonorIdScreenState extends ConsumerState<DigitalDonorIdScreen> {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [
-                    const Color(0xFF1E293B),
-                    const Color(0xFF0F172A),
+                    Color(0xFF1E293B),
+                    Color(0xFF0F172A),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,

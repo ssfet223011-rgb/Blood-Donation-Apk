@@ -5,7 +5,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/config/app_config.dart';
 import '../../core/services/supabase_service.dart';
 import '../../shared/models/blood_request.dart';
-import '../../shared/providers/auth_provider.dart';
 import '../../shared/providers/blood_request_provider.dart';
 import '../../shared/providers/donor_profile_provider.dart';
 import '../../shared/widgets/blood_group_badge.dart';

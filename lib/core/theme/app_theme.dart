@@ -33,7 +33,7 @@ class AppTheme {
           color: secondary,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: Colors.white,
         elevation: 1,
         shadowColor: Colors.black.withOpacity(0.06),
@@ -80,19 +80,17 @@ class AppTheme {
   }
 
   static ThemeData get darkTheme {
-    final primary = AppConfig.primaryColor;
-
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorScheme: ColorScheme.dark(
-        primary: const Color(0xFFEF5350),
+      colorScheme: const ColorScheme.dark(
+        primary: Color(0xFFEF5350),
         onPrimary: Colors.white,
-        secondary: const Color(0xFF90CAF9),
+        secondary: Color(0xFF90CAF9),
         onSecondary: Colors.black,
-        error: const Color(0xFFEF5350),
-        surface: const Color(0xFF1E293B),
-        onSurface: const Color(0xFFF1F5F9),
+        error: Color(0xFFEF5350),
+        surface: Color(0xFF1E293B),
+        onSurface: Color(0xFFF1F5F9),
       ),
       scaffoldBackgroundColor: const Color(0xFF0F172A),
       fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
@@ -107,7 +105,7 @@ class AppTheme {
           color: Colors.white,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: const Color(0xFF1E293B),
         elevation: 2,
         shape: RoundedRectangleBorder(
